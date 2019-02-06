@@ -1,0 +1,192 @@
+spool create_xxrbs_release_objects.lst
+set serveroutput on
+begin
+  execute immediate 'drop table release_deploy';
+  dbms_output.put_line('Table RELEASE_DEPLOY dropped';
+  exception
+    when others then
+      null;
+end;
+/
+
+begin
+  execute immediate 'drop table release_action';
+  dbms_output.put_line('Table RELEASE_ACTION dropped');
+  exception
+    when others then
+      null;
+end;
+/
+
+begin
+  execute immediate 'drop table release_health';
+  dbms_output.put_line('Table RELEASE_HEALTH dropped');
+  exception
+    when others then
+      null;
+end;
+/
+
+begin
+  execute immediate 'drop table release_env_db';
+  dbms_output.put_line('Table RELEASE_ENV_DB dropped');
+  exception
+    when others then
+      null;
+end;
+/
+
+begin
+  execute immediate 'drop sequence sq_deploy';
+  dbms_output.put_line('Sequence SQ_DEPLOY dropped');
+  exception
+    when others then
+      null;
+end;
+/
+
+propmt Create sequence SQ_DEPLOY
+create table RELEASE_DEPLOY (
+ deploy_id         number
+,deploy_date       date
+,env_name          varchar2(30)
+,db_name           varchar2(10)
+,unix_account      varchar2(20)
+,sys_component     varchar2(10)
+,svn_rev_number    integer
+,svn_release       varchar2(50)
+,svn_component     varchar2(50)
+,release_status    varchar2(1)
+,exception_count   integer default 0
+,pre_invalid_cnt   integer default 0
+,post_invalid_cnt  integer default 0
+,deploy_end        date
+,dependency        varchar2(200)
+,comments          varchar2(200)
+,svn_full_patch    varchar2(200)
+,log_file_name     varchar2(200)
+,schema_list       varchar2(200)
+,deploy_log        clob
+);
+
+create unique index pk_release_deploy on release_deploy (deploy_id);
+alter table release_deploy
+add constraint pk_release_deploy primary key (deploy_id)
+using index pk_release_deploy;
+
+create unique index uk_release_deploy
+on release_deploy (deploy_date,env_name,db_name,sys_component,svn_release,svn_rev_number;
+
+alter table release deploy
+add constraint uk_release_deploy unique (deploy_date,env_name,db_name,sys_component,svn_release,svn_rev_number)
+using index uk_release_deploy;
+
+prompt Create table RELEASE_ACTION
+Create table RELEASE_ACTION (
+ deploy_id           number
+,release_item        varchar2(200)
+,start_time          timestamp
+,end_time            timestamp
+,is_db_component     varchar2(1) default 'Y'
+,exception_count     integer     default 0
+,execute_output      varchar2(4000)
+);
+
+create unique index uk_release_action on release_action(deploy_id,release_item,start_time);
+
+alter table release_action
+add constraint uk_release_action
+unique (deploy_id,release_item,start_time) using index uk_release_action;
+
+prompt Create table RELEASE_HEALTH
+create table release_health 9
+deploy_id           number
+,health_date        date
+,pre_post_flag      varchar2(4)
+,schema_owner       varchar2(30)
+,object_name        varchar2(128)
+,object_type        varchar2(30)
+,object_created     date
+,last_ddl_time      date
+);
+
+create unique index uk_release_health
+on release_health(deploy_id, health_date,schema_owner,object_name,object_type,pre_post_flag);
+
+alter table release_health
+add contraint uk_release_health
+unique (deploy_id, health_date,schema_owner,object_name,object_type,pre_post_flag)
+using index uk_release_health;
+
+prompt Create table RELEASE_ENV_DB
+create table release_env_db (
+ env-name            varchar2(30) not null
+,db_name             varchar2(10) not null
+,sys_component       varchar2(10) not null
+.db_domain           varchar2(50)
+,db_instance1        varchar2(10)
+,db_instance2        varchar2(10)
+,is_prod             varchar2(1) default 'Y'
+,non_prod_name       varchar2(20)
+,non_prod_component  varchar2(20)
+);
+
+PROMPT Insert environment to database associations in table RELEASE_ENV_DB
+
+prompt RGL14
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+values ('RGL14','GOGBFGLE','FGL','GOGBFGLE.ORADB.RBSGRP.PPE','GOGBFGLE1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+values ('RGL14','GOGBRDIE','RDI,',GOGBRDIE.ORADB.RBSGRP.PPE','GOGBRDIE1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+Values ('RGL14','GOGBRSBE','RSB,',GOGBRSBE.ORADB.RBSGRP.PPE','GOGBRSBE1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+Values ('RGL14','GOGBOFSE','OFS,',GOGBOFSE.ORADB.RBSGRP.PPE','GOGBOFSE1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+Values ('RGL14','GOGBRBIE','RBI,',GOGBRBIE.ORADB.RBSGRP.PPE','GOGBRBIE1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1,is_prod)
+Values ('RGL14','GOGBCNTE','FCP,',GOGBCNTE.ORADB.RBSGRP.PPE','GOGBCNTE1','n');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1,is_prod)
+Values ('RGL14','GOGBSFCE','SFC,',GOGBSFCE.ORADB.RBSGRP.PPE','GOGBSFCE1','N');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+Values ('RGL14','GOGBRIME','RIM,',GOGBRIME.ORADB.RBSGRP.PPE','GOGBRIME1');
+
+prompt RGL13
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+values ('RGL13','GOGBFGLD','FGL','GOGBFGLD.ORADB.RBSGRP.PPE','GOGBFGLE1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+values ('RGL13','GOGBRDID','RDI','GOGBRDID.ORADB.RBSGRP.PPE','GOGBRDID1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+values ('RGL13','GOGBRSBD','RSB','GOGBRSBD.ORADB.RBSGRP.PPE','GOGBRSBD1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+values ('RGL13','GOGBOFSD','OFS','GOGBOFSD.ORADB.RBSGRP.PPE','GOGBOFSD1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+values ('RGL13','GOGBRBID','RBI','GOGBRBID.ORADB.RBSGRP.PPE','GOGBRBID1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1,is_prod)
+values ('RGL13','GOGBCNTD','FCP','GOGBCNTD.ORADB.RBSGRP.PPE','GOGBCNTD1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1,is_prod)
+values ('RGL13','GOGBSFCD','SFC','GOGBSFCD.ORADB.RBSGRP.PPE','GOGBSFCD1');
+insert into release_env_db (env_name,db_name,sys_component,db_domain,db_instance1)
+values ('RGL13','GOGBRIMD','RIM','GOGBRIMD.ORADB.RBSGRP.PPE','GOGBRIMD1');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

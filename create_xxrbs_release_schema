@@ -1,0 +1,21 @@
+create user xxrbs_release identidied by xxrbs_ease_pwd_12378 default tablespace FIRST_OFS_DATA;
+create role XXRBS_RELEASE_ROLE;
+
+grant
+create session,
+CREATE SEQUENCE,
+CREATE TRIGGER,
+CREATE CLUSTER,
+CREATE PROCEDURE,
+CREATE TYPE,
+CREATE OPERATOR,
+CREATE TABLE,
+CREATE INDEXTYPE to CCRBS_RELEASE_ROLE;
+
+grant select on dba_objects to XXRBS_REALSE_ROLE;
+grant select on dba_users to XXRBS_RELEASE_ROLE;
+
+ALTER USER XXRBS_RELEASE QUOTA UNLIMITED ON FIRST_OFS_DATA;
+grant XXRBS_RELEASE_ROLE to xxrbs_release ;
+
+(END)
